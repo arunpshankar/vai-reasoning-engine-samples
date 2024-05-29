@@ -1,5 +1,5 @@
 project_id: arun-genai-bb
 region: us-central1
-bucket: reasoning-engine-test
+bucket: gs://reasoning-engine-experiments
 credentials_json: ./credentials/key.json
-text_gen_model_name: gemini-1.5-pro-001
+text_gen_model_name: gemini-1.0-pro-002

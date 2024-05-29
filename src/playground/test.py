@@ -1,9 +1,14 @@
+from vertexai.preview.reasoning_engines import ReasoningEngine
 from vertexai.preview.reasoning_engines import LangchainAgent
 from src.config.logging import logger
 from src.config.setup import config
 from typing import Dict
 from typing import Any 
+import vertexai
 import requests
+
+
+vertexai.init(project=config.PROJECT_ID, location=config.REGION, staging_bucket=config.BUCKET)
 
 
 def get_exchange_rate(currency_from: str = "USD", currency_to: str = "EUR", currency_date: str = "latest") -> Dict[str, Any]:
@@ -50,7 +55,7 @@ def create_agent(func_name: str) -> LangchainAgent:
         logger.info(f"Creating agent with function: {func_name}")
         agent = LangchainAgent(model=config.TEXT_GEN_MODEL_NAME, 
                                tools=[func_name], 
-                               agent_executor_kwargs={"return_intermediate_steps": True}
+                               # agent_executor_kwargs={"return_intermediate_steps": True}
                                )
         logger.info("Agent created successfully.")
         return agent
@@ -59,6 +64,39 @@ def create_agent(func_name: str) -> LangchainAgent:
         raise
 
 
+def deploy_agent(agent: LangchainAgent) -> ReasoningEngine:
+    """
+    Deploys a Langchain agent using VertexAI's ReasoningEngine.
+
+    Args:
+        agent (LangchainAgent): The agent to be deployed.
+
+    Returns:
+        ReasoningEngine: The deployed remote agent.
+
+    Raises:
+        Exception: An error occurred while deploying the agent.
+    """
+    try:
+        requirements = [
+            "google-cloud-aiplatform==1.51.0",
+            "langchain==0.1.20",
+            "langchain-google-vertexai==1.0.3",
+            "cloudpickle==3.0.0",
+            "pydantic==2.7.1",
+            "requests==2.32.3"
+        ]
+
+        logger.info("Deploying the agent with the following requirements:")
+        for requirement in requirements:
+            logger.info(requirement)
+
+        remote_agent = ReasoningEngine.create(agent, requirements=requirements)
+        logger.info("Agent deployed successfully.")
+        return remote_agent
+    except Exception as e:
+        logger.error(f"An error occurred while deploying the agent: {e}")
+        raise
 
 
 if __name__ == '__main__':
@@ -69,6 +107,7 @@ if __name__ == '__main__':
     response = current_converter.query(input=query)
     answer = response['output']
     print(f'Answer = {answer}')
+    """
     intermediate_steps = response['intermediate_steps']
     tool = intermediate_steps[0][0]['kwargs']['tool']
     tool_input = intermediate_steps[0][0]['kwargs']['tool_input']
@@ -76,6 +115,9 @@ if __name__ == '__main__':
     logger.info(f'Tool ==> {tool}')
     logger.info(f'Tool Input  ==> {tool}')
     logger.info(f'Action ==> {action}')
+    """
+    remote_agent = deploy_agent(agent=current_converter)
+    print(remote_agent.resource_name)
 
 
 
