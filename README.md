@@ -1,2 +1,8 @@
 # vai-reasoning-engine-samples
-Collection of sample notebooks related to VertexAI Reasoning Engine
+
+Collection of examples related to VertexAI Reasoning Engine
+
+
+
+
+export PYTHONPATH=$PYTHONPATH:.
