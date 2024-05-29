@@ -1,4 +1,4 @@
-from vertexai.preview import reasoning_engines
+from vertexai.preview.reasoning_engines import LangchainAgent
 from src.config.logging import logger
 from src.config.setup import config
 from typing import Dict
@@ -36,7 +36,7 @@ def get_exchange_rate(currency_from: str = "USD", currency_to: str = "EUR", curr
 
 
 
-def create_agent(func_name: str) -> reasoning_engines.LangchainAgent:
+def create_agent(func_name: str) -> LangchainAgent:
     """
     Creates a Langchain agent using the specified function name.
 
@@ -48,11 +48,10 @@ def create_agent(func_name: str) -> reasoning_engines.LangchainAgent:
     """
     try:
         logger.info(f"Creating agent with function: {func_name}")
-        agent = reasoning_engines.LangchainAgent(
-            model=config.TEXT_GEN_MODEL_NAME,
-            tools=[func_name],
-            agent_executor_kwargs={"return_intermediate_steps": True}
-        )
+        agent = LangchainAgent(model=config.TEXT_GEN_MODEL_NAME, 
+                               tools=[func_name], 
+                               agent_executor_kwargs={"return_intermediate_steps": True}
+                               )
         logger.info("Agent created successfully.")
         return agent
     except Exception as e:
