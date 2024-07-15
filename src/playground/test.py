@@ -88,8 +88,8 @@ def deploy_agent(agent: LangchainAgent) -> ReasoningEngine:
         ]
 
         logger.info("Deploying the agent with the following requirements:")
-        for requirement in requirements:
-            logger.info(requirement)
+        # for requirement in requirements:
+        #    logger.info(requirement)
 
         remote_agent = ReasoningEngine.create(agent, requirements=requirements)
         logger.info("Agent deployed successfully.")
